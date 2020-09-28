@@ -32,6 +32,8 @@ namespace blogApi
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -42,6 +44,15 @@ namespace blogApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+        {
+            options.AddPolicy(name: MyAllowSpecificOrigins,
+                              builder =>
+                              {
+                                  builder.WithOrigins("*");
+                              });
+            });
+
             services.AddControllers();
             String connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<MainContext>(
@@ -67,6 +78,8 @@ namespace blogApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+             app.UseCors(MyAllowSpecificOrigins);
+
             app.UseAuthentication();
 
             app.UseAuthorization();
